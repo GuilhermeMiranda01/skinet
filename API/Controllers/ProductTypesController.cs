@@ -10,25 +10,25 @@ namespace API.Controllers
     //tentar passar uma string como parametro do método GetProduct - tem outras coisas mas por enquanto só isso...-
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductTypesController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
+        private readonly IProductTypeRepository _productTypeRepository;
 
-        public ProductsController(IProductRepository productRepository)
+        public ProductTypesController(IProductTypeRepository productTypeRepository)
         {
-            _productRepository = productRepository;
+            _productTypeRepository = productTypeRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetProducts()
+        public async Task<ActionResult<List<ProductType>>> GetProductTypes()
         {
-            return Ok(await _productRepository.GetAllAsync());
+            return Ok(await _productTypeRepository.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<ProductType>> GetProduct(int id)
         {
-            return Ok(await _productRepository.GetByIdAsync(id));
+            return Ok(await _productTypeRepository.GetByIdAsync(id));
         }
     }
 }
