@@ -8,9 +8,8 @@ namespace API.Controllers
 {
     //ApiController faz o controle das rotas, e adiciona algumas validações, como por exemplo lança o bad request(400) se alguém
     //tentar passar uma string como parametro do método GetProduct - tem outras coisas mas por enquanto só isso...-
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductTypesController : ControllerBase
+
+    public class ProductTypesController : BaseApiController
     {
         private readonly IProductTypeRepository _productTypeRepository;
 

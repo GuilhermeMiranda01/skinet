@@ -2,6 +2,9 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using API.Helpers;
+using API.Middleware;
+using Microsoft.AspNetCore.Mvc;
+using API.Controllers.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,19 @@ builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 builder.Services.AddScoped<IProductBrandRepository, ProductBrandRepository>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddControllers();
+builder.Services.Configure<ApiBehaviorOptions>(opt => 
+{
+    opt.InvalidModelStateResponseFactory = actionContext =>
+    {
+        var errors = actionContext.ModelState.Where(e => e.Value.Errors.Count > 0).SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage).ToArray();
+        var errorResponse = new ApiValidationErrorResponse
+        {
+            Errors = errors
+        };
+
+        return new BadRequestObjectResult(errorResponse);
+    };
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //ADICIONANDO DB CONTEXT
@@ -35,12 +51,11 @@ using(var scope = app.Services.CreateScope())
         logger.LogError(ex, "Deu erro nas migrations");
     }
 }
+app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
