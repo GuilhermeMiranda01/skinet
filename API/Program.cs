@@ -32,11 +32,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<StoreContext>(x => x.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 //ADICIONANDO O MAPPING PROFILE DO AUTOMAPPER
 builder.Services.AddAutoMapper(typeof(MappingProfiles));
+builder.Services.AddCors(opt => {
+    opt.AddPolicy("CorsPolicy", policy =>{
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
+    });
+});
 var app = builder.Build();
+app.UseCors("CorsPolicy");
 using(var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var loggerFactory = services.GetRequiredService<ILoggerFactory>(); 
+    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+    
     try
     {
         var context = services.GetRequiredService<StoreContext>();
